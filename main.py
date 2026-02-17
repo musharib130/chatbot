@@ -1,28 +1,38 @@
 from langchain_core.messages import HumanMessage
 from rich.console import Console
 from app.graph import build_graph
+from app.state import ChatState
+import asyncio
 
 console = Console()
 graph = build_graph()
 
-# Initialize conversation state
-state = {"messages": []}
-
 console.print("[bold green]LangGraph CLI Chatbot[/bold green]")
 console.print("Type 'exit' to quit.\n")
 
-while True:
-    user_input = console.input("[bold blue]You:[/bold blue] ")
+state = ChatState(
+    messages=[]
+)
 
-    if user_input.lower() == "exit":
-        break
+async def fun():
+    while True:
+        user_input = console.input("[bold blue]You:[/bold blue] ")
 
-    # Append user message to state
-    state["messages"].append(HumanMessage(content=user_input))
+        if user_input.lower() == "exit":
+            break
 
-    # Invoke LangGraph
-    state = graph.invoke(state)
+        # Append user message to state
+        state["messages"].append(HumanMessage(content=user_input))
 
-    # Print AI response
-    ai_message = state["messages"][-1].content
-    console.print(f"[bold magenta]Bot:[/bold magenta] {ai_message}")
+        events = graph.astream_events(input=state, version="v2")
+
+        console.print("[bold magenta]Bot:[/bold magenta]", end="")
+
+        async for event in events:
+            if event['event'] == "on_chain_stream" and event['data']["chunk"].get("messages"):
+                for msg in event['data']["chunk"]["messages"]:
+                    print(msg.content, end="", flush=True)  # end="" for streaming effect
+
+        print(state)
+
+asyncio.run(fun())
