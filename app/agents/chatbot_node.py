@@ -6,7 +6,7 @@ async def chatbot_node(state: ChatState):
     # partial_response = ""
     for chunk in llm.stream(state["messages"]):
         # partial_response += chunk
-         {
+        yield {
             "messages": [
                 AIMessage(content=chunk)
             ]
