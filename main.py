@@ -28,11 +28,11 @@ async def fun():
 
         console.print("[bold magenta]Bot:[/bold magenta]", end="")
 
-        async for event in events:
-            if event['event'] == "on_chain_stream" and event['data']["chunk"].get("messages"):
-                for msg in event['data']["chunk"]["messages"]:
-                    print(msg.content, end="", flush=True)  # end="" for streaming effect
+        async for event in events:    
+            if event['event'] == 'on_llm_stream':
+                print(event['data']['chunk'].text, end="", flush=True)
 
-        print(state)
+        print()
+
 
 asyncio.run(fun())
