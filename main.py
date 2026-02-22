@@ -28,11 +28,12 @@ async def fun():
 
         console.print("[bold magenta]Bot:[/bold magenta]", end="")
 
-        async for event in events:    
-            if event['event'] == 'on_llm_stream':
+        async for event in events:
+            # print(event, end="\n\n")   
+            if event['event'] == 'on_chat_model_stream':
                 print(event['data']['chunk'].text, end="", flush=True)
 
-        print()
+        print('\n')
 
 
 asyncio.run(fun())

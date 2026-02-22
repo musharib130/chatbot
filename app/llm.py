@@ -1,6 +1,7 @@
-from langchain_ollama import OllamaLLM
+from langchain_ollama import ChatOllama
 
-llm = OllamaLLM(
-    model="mistral",  # change to your model name
-    base_url="http://localhost:11434",
-)
+def get_llm():
+    return ChatOllama(
+        model="mistral",  # change to your model name
+        base_url="http://localhost:11434",
+    )
