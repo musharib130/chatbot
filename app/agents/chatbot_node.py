@@ -1,34 +1,33 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from rich.console import Console
+
 from ..state import ChatState
 from ..llm import get_llm
-from ..tools.search import get_search
-from ..tools.current_time import current_time
 
 llm = get_llm()
-search = get_search()
+
+console = Console()
 
 system_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             """
-            You must ALWAYS use DuckDuckGo Search for any real-world query.
-            Never answer from your internal knowledge or cached information.
-            Do not output tool calls as text — call them directly.
+            You are a assisstant, go through the available information in the context and summarize the information for me.
             """
         ),
         MessagesPlaceholder(variable_name="messages")
     ]
 )
-tools = [search, current_time]
 
-llm_with_tools = system_prompt | llm.bind_tools(tools=tools)
+llm_with_tools = system_prompt | llm
 
 def chatbot_node(state: ChatState):
+
+    console.print(f"[bold red]state at chatnode =>[/bold red] {state}")
+
     res = llm_with_tools.invoke(state['messages'])
     
-    # print(res)
-
     return {
         "messages": [res]
     }
