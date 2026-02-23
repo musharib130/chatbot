@@ -10,21 +10,27 @@ tools_node = ToolNode(tools=tools)
 TOOLS = 'tools'
 CHATBOT = 'chatbot'
 
+def should_continue(state: ChatState) -> str:
+    last_message = state["messages"][-1]
+    if last_message.tool_calls:
+        return "tools"
+    return "end"
+
 def build_graph():
     builder = StateGraph(ChatState)
 
-    # Add a single chatbot node
+    # Add a single chatbot node 
     builder.add_node(CHATBOT, chatbot_node)
     builder.add_node(TOOLS, tools_node)
 
     builder.set_entry_point(CHATBOT)
-    
+
     builder.add_conditional_edges(
         CHATBOT, 
-        tools_condition,
+        should_continue,
         {
             "tools": TOOLS,
-            "__end__": END
+            "end": END
         }
     )
 

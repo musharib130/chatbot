@@ -1,11 +1,10 @@
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from rich.console import Console
 from app.graph import build_graph
 from app.state import ChatState
 import asyncio
 
 console = Console()
-graph = build_graph()
 
 console.print("[bold green]LangGraph CLI Chatbot[/bold green]")
 console.print("Type 'exit' to quit.\n")
@@ -16,6 +15,8 @@ state = ChatState(
 
 async def fun():
     while True:
+        graph = build_graph()
+        
         user_input = console.input("[bold blue]You:[/bold blue] ")
 
         if user_input.lower() == "exit":
@@ -28,12 +29,24 @@ async def fun():
 
         console.print("[bold magenta]Bot:[/bold magenta]", end="")
 
-        async for event in events:
-            # print(event, end="\n\n")   
-            if event['event'] == 'on_chat_model_stream':
-                print(event['data']['chunk'].text, end="", flush=True)
+        ai_res = ""
 
-        print('\n')
+        async for event in events:
+            if event['event'] == 'on_tool_start':
+                print(f"Using {event['name']} with data => {event['data']['input']}")
+
+            if event['event'] == 'on_chat_model_stream':
+                text = event['data']['chunk'].text
+                
+                ai_res += text
+                print(text, end="", flush=True)
+            # else:
+            #     print(event["event"], end="\n\n") 
+
+
+        state["messages"].append(AIMessage(ai_res))
+        print()
+        # print(f'\n {state} \n')
 
 
 asyncio.run(fun())
