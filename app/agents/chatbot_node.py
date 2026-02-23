@@ -2,6 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from ..state import ChatState
 from ..llm import get_llm
 from ..tools.search import get_search
+from ..tools.current_time import current_time
 
 llm = get_llm()
 search = get_search()
@@ -19,7 +20,7 @@ system_prompt = ChatPromptTemplate.from_messages(
         MessagesPlaceholder(variable_name="messages")
     ]
 )
-tools = [search]
+tools = [search, current_time]
 
 llm_with_tools = system_prompt | llm.bind_tools(tools=tools)
 
