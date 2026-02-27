@@ -12,22 +12,29 @@ system_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """
-            You must ALWAYS use DuckDuckGo Search for any real-world query.
-            Never answer from your internal knowledge or cached information.
-            Do not output tool calls as text — call them directly.
+            You are a research assistant with over 10 years of experience.
+
+            Use the provided context to answer the question.
+            If the answer is not in the context don't answer at all.
+            Never answer from your own knowledge.
+
+            Context:
+            {context}
             """
         ),
         MessagesPlaceholder(variable_name="messages")
     ]
 )
-tools = [search, current_time]
 
-llm_with_tools = system_prompt | llm.bind_tools(tools=tools)
+tools = [current_time, search]
+
+llm_with_tools = system_prompt | llm
 
 def chatbot_node(state: ChatState):
-    res = llm_with_tools.invoke(state['messages'])
-    
-    # print(res)
+    res = llm_with_tools.invoke({
+        "messages": state['messages'],
+        "context": state["context"]
+    })
 
     return {
         "messages": [res]

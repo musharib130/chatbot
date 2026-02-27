@@ -20,7 +20,8 @@ dependencies = [
     "tzdata (>=2025.3,<2026.0)",
     "pypdf (>=6.7.2,<7.0.0)",
     "sentence-transformers (>=5.2.3,<6.0.0)",
-    "chromadb (>=1.5.1,<2.0.0)"
+    "chromadb (>=1.5.1,<2.0.0)",
+    "langchain-chroma (>=1.1.0,<2.0.0)"
 ]
 
 
