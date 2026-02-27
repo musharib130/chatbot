@@ -1,7 +1,12 @@
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def get_llm():
-    return ChatOllama(
-        model="mistral",  # change to your model name
-        base_url="http://localhost:11434",
+    return ChatOpenAI(
+        model="gpt-4o-mini",  # or "gpt-4o", "gpt-4.1", etc.
+        temperature=0,
+        api_key=os.getenv("OPENAI_API_KEY"),
     )
